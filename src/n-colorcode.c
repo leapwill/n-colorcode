@@ -8,7 +8,7 @@
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *argv[])
 {
     srand(time(NULL));
-    int ans[4] = {rand() % 5 + 1, rand() % 5 + 1, rand() % 5 + 1, rand() % 5 + 1};
+    int ans[4] = {rand() % 6 + 1, rand() % 6 + 1, rand() % 6 + 1, rand() % 6 + 1};
 
     // TODO: command-line options
 
@@ -177,7 +177,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
                 int color = game[attempt][i];
                 for (int a = 0; a < 4; a++)
                 {
-                    if (usedAns[a] == FALSE && color == ans[a]) // don't reuse ans[x]
+                    if (usedAns[a] == FALSE && color == ans[a] && result[i] == 0) // don't reuse ans[x] or overwrite result[x]
                     {
                         usedAns[a] = TRUE;
                         result[i] = 1;
