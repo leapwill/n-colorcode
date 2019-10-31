@@ -1,19 +1,49 @@
-CC = gcc
-CFLAGS = -Wall -Werror -Wextra -Wpedantic -std=c11 -I ./include
-LDFLAGS =  -fsanitize=address -lncurses 
+# based on https://bitbucket.org/neilb/genmake/src/default/srcinc/makefile
+# found via https://latedev.wordpress.com/2014/11/08/generic-makefiles-with-gcc-and-gnu-make/
 
-SRC = src/n-colorcode.c
-DEPS = n-colorcode.h
-OBJ = $(SRC:.c=.o)
-EXEC = n-colorcode
+SHELL := /bin/sh
 
-bin/%.o: %.c $(DEPS)
-	$(CC) -c -o obj/$@ $< $(CFLAGS)
+PRODUCT := n-colorcode
 
-all: $(EXEC)
+BINDIR := bin
+INCDIR := include
+SRCDIR := src
+OBJDIR := obj
 
-$(EXEC): $(OBJ)
-	$(CC) -o bin/$@ $(OBJ) $(LDFLAGS)
+CC := gcc
+LD := gcc
+INCDIRS := -I$(INCDIR)
+CCFLAGS := -std=c11 -Wall -Wextra -Wpedantic
+LDFLAGS := -fsanitize=address -lncurses
 
+SRCFILES := $(wildcard $(SRCDIR)/*.c)
+OBJFILES := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCFILES))
+DEPFILES := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.d,$(SRCFILES))
+
+$(BINDIR)/$(PRODUCT): $(OBJFILES)
+	$(LD) $(CCFLAGS) -O2 $^ $(LDFLAGS) -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CCFLAGS) $(INCDIRS) -c $< -o $@
+
+$(OBJDIR)/%.d: $(SRCDIR)/%.c
+	$(CC) $(CCFLAGS) $(INCDIRS) -MM $< \
+	| tr '\n\r\\' ' ' \
+	| sed -e 's%^%$@ %' -e 's% % $(OBJDIR)/%'\
+	> $@
+
+$(BINDIR)/$(PRODUCT)-debug: $(SRCFILES)
+	$(CC) $(CCFLAGS) -g -O0 $(INCDIRS) $^ $(LDFLAGS) -o $@
+
+.PHONY: clean depends debug
 clean:
-	rm -rf $(OBJ) $(EXEC)
+	rm -f $(OBJDIR)/*.o $(BINDIR)/$(PRODUCT)
+
+depends:
+	rm -f $(OBJDIR)/*.d
+	$(MAKE) $(DEPFILES)
+
+debug:
+	$(MAKE) $(BINDIR)/$(PRODUCT)-debug
+
+-include $(DEPFILES)
