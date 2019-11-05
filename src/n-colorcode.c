@@ -32,6 +32,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
     init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
     init_color(COLOR_GRAY, 200, 200, 200);
     init_pair(COLOR_GRAY, COLOR_GRAY, COLOR_BLACK);
+    char *COLORS[] = {"", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"};
 
     cbreak();
     noecho();
@@ -222,13 +223,16 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
             }
             if (result[0] == 2 && result[1] == 2 && result[2] == 2 && result[3] == 2)
             {
-                // TODO end game for win
                 printMsg("win");
+                getch();
+                quit(0);
             }
-            else if (attempt >= 12)
+            else if (attempt >= 10)
             {
-                // TODO lose, out of attempts
-                printMsg("lose");
+                // lose, out of attempts
+                printMsg("lose, answer was %s %s %s %s", COLORS[ans[0]], COLORS[ans[1]], COLORS[ans[2]], COLORS[ans[3]]);
+                getch();
+                quit(0);
             }
             else
             {
@@ -250,6 +254,13 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
     endwin();
     exit(0);
     return 0;
+}
+
+int quit(int status)
+{
+    endwin();
+    exit(status);
+    return status;
 }
 
 void printMsg(const char *str, ...)

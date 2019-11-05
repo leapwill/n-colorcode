@@ -35,7 +35,7 @@ $(OBJDIR)/%.d: $(SRCDIR)/%.c
 $(BINDIR)/$(PRODUCT)-debug: $(SRCFILES)
 	$(CC) $(CCFLAGS) -g -O0 $(INCDIRS) $^ $(LDFLAGS) -o $@
 
-.PHONY: clean depends debug
+.PHONY: clean depends debug $(PRODUCT)
 clean:
 	rm -f $(OBJDIR)/*.o $(BINDIR)/$(PRODUCT)
 
@@ -45,5 +45,8 @@ depends:
 
 debug:
 	$(MAKE) $(BINDIR)/$(PRODUCT)-debug
+
+$(PRODUCT):
+	$(MAKE) $(BINDIR)/$(PRODUCT)
 
 -include $(DEPFILES)
