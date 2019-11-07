@@ -1,16 +1,47 @@
+#include "n-colorcode.h"
 #include <ncurses.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/types.h>
 #include <time.h>
-#include "n-colorcode.h"
+#include <unistd.h>
 
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *argv[])
+int main(int argc, char *const *argv)
 {
     srand(time(NULL));
     int ans[4] = {rand() % 6 + 1, rand() % 6 + 1, rand() % 6 + 1, rand() % 6 + 1};
+    char *COLORS[] = {"", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"};
 
-    // TODO: command-line options
+    int c;
+    int numAttempts = 10;
+    unsigned char isCheater = FALSE;
+    while ((c = getopt(argc, argv, "d:c")) != -1)
+    {
+        switch (c)
+        {
+        case 'd':
+            /* code */
+            if(!strcmp("hard", optarg))
+            {
+                numAttempts = 7;
+            }
+            else if (!strcmp("perfect", optarg))
+            {
+                numAttempts = 5;
+            }
+            else if (!strcmp("normal", optarg))
+            {
+                numAttempts = 10;
+            }
+            break;
+        case 'c':
+            isCheater = TRUE;
+            break;
+        default:
+            exit(-1);
+        }
+    }
 
     // region window setup
     initscr();
@@ -32,7 +63,6 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
     init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
     init_color(COLOR_GRAY, 200, 200, 200);
     init_pair(COLOR_GRAY, COLOR_GRAY, COLOR_BLACK);
-    char *COLORS[] = {"", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"};
 
     cbreak();
     noecho();
@@ -40,12 +70,12 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
     // endregion
 
     // region game setup
-    int *game[11];
+    int *game[numAttempts + 1];
     game[0] = calloc(6, sizeof(int));
     game[0][0] = COLOR_RED, game[0][1] = COLOR_GREEN, game[0][2] = COLOR_YELLOW;
     game[0][3] = COLOR_BLUE, game[0][4] = COLOR_MAGENTA, game[0][5] = COLOR_CYAN;
 
-    for (int i = 1; i < 11; i++)
+    for (int i = 1; i <= numAttempts; i++)
     {
         game[i] = calloc(4, sizeof(int));
     }
@@ -67,7 +97,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
 
     // setup board
     int selector2[2] = {2, 14};
-    for (int i = selector2[0]; i < selector2[0] + 20; i += 2)
+    for (int i = selector2[0]; i < selector2[0] + (2 * numAttempts); i += 2)
     {
         for (int j = selector2[1]; j <= selector2[1] + 15; j++)
         {
@@ -86,8 +116,10 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
     // endregion
 
     // region game loop
-    // TODO debug mode to print answer
-    // printMsg("ans is %d %d %d %d", ans[0], ans[1], ans[2], ans[3]);
+    if (isCheater == TRUE)
+    {
+        printMsg("ans is %s %s %s %s", COLORS[ans[0]], COLORS[ans[1]], COLORS[ans[2]], COLORS[ans[3]]);
+    }
     int attempt = 1;
     while (true)
     {
@@ -227,7 +259,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char const *a
                 getch();
                 quit(0);
             }
-            else if (attempt >= 10)
+            else if (attempt >= numAttempts)
             {
                 // lose, out of attempts
                 printMsg("lose, answer was %s %s %s %s", COLORS[ans[0]], COLORS[ans[1]], COLORS[ans[2]], COLORS[ans[3]]);
