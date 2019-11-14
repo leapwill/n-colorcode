@@ -67,6 +67,7 @@ int main(int argc, char *const *argv)
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    bkgd(COLOR_PAIR(COLOR_BLACK));
     // endregion
 
     // region game setup
