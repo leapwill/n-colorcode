@@ -4,8 +4,17 @@ The game [Colorcode/Mastermind](https://en.wikipedia.org/wiki/Mastermind_(board_
 
 ## Usage
 
-`make` to build.  
-`bin/n-colorcode` to play.
+### Compiling Rust
+
+`cargo run` to build and play
+
+### Compiling C
+
+`cd old-c`
+`make` to build  
+`bin/n-colorcode` to play
+
+### Playing
 
 <kbd>↑</kbd>, <kbd>↓</kbd> to change your selected color  
 <kbd>←</kbd>, <kbd>→</kbd> to select the space on the board  
@@ -17,4 +26,4 @@ White blocks in the response indicate the number of correct color and location. 
 
 ## About
 
-This is my first project in ncurses.
+This is my first project in ncurses, and my first time using Rust.
